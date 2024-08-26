@@ -5,13 +5,16 @@
     margin: 0;
     padding: 0;
 } */
+ .survey-main{
+    margin-top: 150px;
+ }
 
 .survey-form-body{
     font-family: 'Arial', sans-serif;
     background-color: black;
     color: #333;
-    margin: 0;
     padding: 0;
+    
 }
 
 .form-container {

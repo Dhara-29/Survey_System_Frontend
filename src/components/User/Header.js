@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 export default function Header() {
@@ -8,19 +8,22 @@ export default function Header() {
     const userId = localStorage.getItem("user_id");
 
     const logout = () => {
-        if (userId) {
-            localStorage.clear();
-        }
-        console.log("After clear : ", userId);
+        const confirmLogout = window.confirm("Do you really want to log out ?");
+        if (confirmLogout) {
+            if (userId) {
+                localStorage.clear();
+            }
+            console.log("After clear : ", userId);
 
-        Swal.fire({
-            position: "center",
-            icon: "success",
-            title: "Logged Out",
-            showConfirmButton: false,
-            timer: 1500,
-        });
-        navigate("/userSignUp");
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Logged Out",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+            navigate("/userSignUp");
+        }
     };
 
     return (
@@ -35,7 +38,7 @@ export default function Header() {
                             <ul>
                                 <li className='active'><a href='/'>Home</a></li>
                                 <li>
-                                    <a 
+                                    <a
                                         onClick={() => {
                                             if (userId) {
                                                 navigate('/createSurvey');
@@ -45,21 +48,43 @@ export default function Header() {
                                                     title: 'Access Denied',
                                                     text: 'Please sign in to create surveys.',
                                                 });
+                                                navigate('/userSignIn')
                                             }
                                         }}
                                     >
                                         Create Surveys
                                     </a>
                                 </li>
-                                <li><a href='#'>View Surveys</a></li>
-                                <li><a href='#'>View Responses</a></li>
+                                <li><a  onClick={() => {
+                                    if (userId) {
+                                        navigate('/viewSurveys');
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Access Denied',
+                                            text: 'Please sign in to view surveys.',
+                                        });
+                                        navigate('/userSignIn');
+                                    }
+                                }}>View Surveys</a></li>
+                                {/* <li><a href='#'>View Responses</a></li> */}
                                 <span>
+                                    <span>
+                                        {userId ? (
+                                            <button className='btn btn-dark' onClick={()=>navigate('/userProfile')}>Profile</button>
+                                        ) : (
+                                            <button className='btn btn-dark' onClick={() => navigate('/aboutUs')}>About Us</button>
+                                        )}
+                                    </span>
+                                    &nbsp;
                                     {userId ? (
                                         <button className='btn btn-dark' onClick={logout}>Log out</button>
                                     ) : (
                                         <button className='btn btn-dark' onClick={() => navigate('/userSignUp')}>Join now</button>
                                     )}
                                 </span>
+
+                                &nbsp;&nbsp;&nbsp;
                             </ul>
                         </nav>
                     </div>
@@ -68,4 +93,3 @@ export default function Header() {
         </div>
     );
 }
-

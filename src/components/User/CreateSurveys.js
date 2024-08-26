@@ -1,163 +1,49 @@
-
-// import '../User/CreateSurvey.css';
-// import axios from 'axios';
-// import React, { useEffect, useState } from 'react';
-// import Header from './Header';
-
-// export default function CreateSurveys() {
-//     const [categoryList, setCategoryList] = useState([]);
-//     const [newCategory, setNewCategory] = useState('');
-//     const [error, setError] = useState(null);
-//     const [isLoading, setIsLoading] = useState(true);
-
-//     useEffect(() => {
-//         axios.get('http://localhost:3000/category/getAllCategories')
-//             .then(response => {
-//                 console.log(response.data); // Log the entire response data to understand its structure
-
-//                 // Check if response.data is an array
-//                 if (Array.isArray(response.data)) {
-//                     // Map over the array to extract category names and IDs
-//                     const categories = response.data.map(category => ({
-//                         value: category.categoryid, // or use another unique identifier if needed
-//                         text: category.category_name
-//                     }));
-
-//                     setCategoryList(categories); // Set the categories in state
-//                 } else {
-//                     console.error('Unexpected response structure:', response.data);
-//                     setError(new Error('Unexpected response structure'));
-//                 }
-
-//                 setIsLoading(false);
-//             })
-//             .catch(err => {
-//                 console.error("Error fetching categories:", err);
-//                 setError(err);
-//                 setIsLoading(false);
-//             });
-//     }, []);
-
-//     const handleAddCategory = () => {
-//         if (!newCategory.trim()) {
-//             alert('Please enter a category name');
-//             return;
-//         }
-
-//         axios.post('http://localhost:3000/category/addCategory', { category_name: newCategory })
-//             .then(response => {
-//                 // Assuming the server returns the new category with an ID
-//                 const newCategoryData = response.data; // Update based on your response structure
-//                 setCategoryList(prevCategories => [
-//                     ...prevCategories,
-//                     {
-//                         value: newCategoryData.categoryid,
-//                         text: newCategoryData.category_name
-//                     }
-//                 ]);
-//                 setNewCategory(''); // Clear the input field
-//             })
-//             .catch(err => {
-//                 console.error("Error adding category:", err);
-//                 setError(err);
-//             });
-//     };
-
-//     if (isLoading) return <p>Loading categories...</p>;
-//     if (error) return <p>Error fetching categories: {error.message}</p>;
-
-//     return (
-//         <>
-//             <Header />
-//             <div className="form-container survey-form-body">
-//                 <h1>Survey Form</h1>
-//                 <form action="/submit_form" method="post">
-//                     <div className="form-group">
-//                         <label htmlFor="survey-title">Survey Title</label>
-//                         <input type="text" id="survey-title" name="survey-title" required />
-//                     </div>
-//                     <div className="form-group">
-//                         <label htmlFor="survey_description">Description</label>
-//                         <input type="email" id="survey_description" name="survey_description" required />
-//                     </div>
-
-//                     <div className="form-group">
-//                         <label htmlFor="survey-category">Choose Category</label>
-//                         <select id="survey-category" name="survey-category" required>
-//                             <option value="">Please select any category</option>
-//                             {categoryList.length > 0 ? (
-//                                 categoryList.map(category => (
-//                                     <option key={category.value} value={category.value}>
-//                                         {category.text}
-//                                     </option>
-//                                 ))
-//                             ) : (
-//                                 <option value="" disabled>No categories available</option>
-//                             )}
-//                         </select>
-//                     </div>
-
-//                     <div className="form-group">
-//                         <label htmlFor="new-category">Add New Category</label>
-//                         <input
-//                             type="text"
-//                             id="new-category"
-//                             value={newCategory}
-//                             onChange={(e) => setNewCategory(e.target.value)}
-//                             placeholder="Enter new category"
-//                         />
-                     
-//                     </div>
-//                      <button type="button " className='btn btn-outline-warning' onClick={handleAddCategory}>Add Category</button>
-
-//                     <button className='btn btn-outline-danger' type="submit">Submit</button>
-//                 </form>
-//             </div>
-//         </>
-//     );
-// }
 import '../User/CreateSurvey.css';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import Footer from './Footer';
 
 export default function CreateSurveys() {
-    let user_id = localStorage.getItem('user_id');
-    
+    const navigate = useNavigate();
+
+    let userId = localStorage.getItem('user_id');
+
     const [categoryList, setCategoryList] = useState([]);
     const [newCategory, setNewCategory] = useState('');
     const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [formData, setFormData] = useState({
-        user_id,
-        title: '',
-        description: '',
-        category: '',
+        userId,
+        survey_title: '',
+        survey_description: '',
+        category_id: '',
         status: 'draft' // Default status
     });
+
+
+    const [categorySelected, setCategorySelected] = useState(false); // State to track category selection
+
 
     useEffect(() => {
         axios.get('http://localhost:3000/category/getAllCategories')
             .then(response => {
-
                 if (Array.isArray(response.data)) {
                     const categories = response.data.map(category => ({
                         value: category.categoryid,
                         text: category.category_name
                     }));
-
                     setCategoryList(categories);
                 } else {
                     console.error('Unexpected response structure:', response.data);
                     setError(new Error('Unexpected response structure'));
                 }
-
-                setIsLoading(false);
             })
             .catch(err => {
                 console.error("Error fetching categories:", err);
                 setError(err);
-                setIsLoading(false);
+
             });
     }, []);
 
@@ -167,21 +53,50 @@ export default function CreateSurveys() {
             return;
         }
 
-        axios.post('http://localhost:3000/category/addCategory', { category_name: newCategory })
+        axios.post('http://localhost:3000/category/addCategory', { category_name: newCategory, user_id: userId })
             .then(response => {
-                const newCategoryData = response.data;
-                setCategoryList(prevCategories => [
-                    ...prevCategories,
-                    {
-                        value: newCategoryData.categoryid,
-                        text: newCategoryData.category_name
-                    }
-                ]);
-                setNewCategory('');
+                console.log("New category name : ", newCategory);
+
+                if (response.status === 200) {
+                    Swal.fire({
+                        position: "center",
+                        icon: "success",
+                        title: "Category added Successfully",
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    const newCategoryData = response.data.data;
+
+                    setCategoryList(prevCategories => [
+                        ...prevCategories,
+                        {
+                            value: newCategoryData.categoryid,
+                            text: newCategoryData.category_name
+                        }
+                    ]);
+
+
+                    setNewCategory('');
+                }
             })
             .catch(err => {
-                console.error("Error adding category:", err);
-                setError(err);
+                if (err.response.status === 400) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Category Already Exist",
+
+                    });
+
+                } else {
+                    console.log(err);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops..rtrt.",
+                        text: "Something went wrong!",
+                    });
+                }
+                // console.error("Error adding category:", err);
+                // setError(err);
             });
     };
 
@@ -190,127 +105,167 @@ export default function CreateSurveys() {
         setFormData(prevFormData => ({
             ...prevFormData,
             [name]: value
+
         }));
+
+        // Update categorySelected state when category is chosen
+        if (name === 'category_id') {
+            setCategorySelected(value !== '');
+        }
     };
 
     const handleSubmit = (status) => {
-        const { title, description, category } = formData;
+        const { survey_title, survey_description, category_id } = formData;
 
-        if (!title || !description || !category) {
+        if (!survey_title || !survey_description || !category_id) {
             alert('Please fill out all required fields.');
             return;
         }
 
         axios.post('http://localhost:3000/survey/createSurvey', {
-            user_id,
-            title,
-            description,
+            userId,
+            survey_title,
+            survey_description,
             status,
-            category,
+            category_id,
         })
-        .then(response => {
-            alert(`Survey ${status === 'draft' ? 'saved as draft' : 'published'} successfully!`);
-            // Optionally, you can reset the form or navigate away
-        })
-        .catch(err => {
-            console.error("Error submitting survey:", err);
-            setError(err);
-        });
-    };
+            .then(response => {
+                if (response.status === 200) {
+                    alert(`Survey ${status === 'draft' ? 'saved as draft' : 'published'} successfully!`);
 
-    if (isLoading) return <p>Loading categories...</p>;
-    if (error) return <p>Error fetching categories: {error.message}</p>;
+                    // Optionally, you can reset the form or navigate away
+                    Swal.fire({
+                        position: "center",
+                        icon: "success",
+                        title: "Survey Created Successfully",
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    if (status === 'published') {
+                        navigate('/questionsPage', { state: { survey_id: response.data.data.survey_id } }); // Pass surveyId as state
+                    }
+                }
+            })
+            .catch(err => {
+                if (err.response.status === 400) {
+                    // Handle known error for already signed-up users
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Survey already exist",
+                    });
+                } else {
+                    // Handle other errors
+                    console.log(err);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Something went wrong!",
+                    });
+                }
+                // console.error("Error submitting survey:", err);
+                // setError(err);
+            });
+
+    };
 
     return (
         <>
             <Header />
-            <div className="form-container survey-form-body">
-                <h1>Survey Form</h1>
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSubmit(formData.status);
-                    }}
-                >
-                    <div className="form-group">
-                        <label htmlFor="survey-title">Survey Title</label>
-                        <input
-                            type="text"
-                            id="survey-title"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="survey_description">Description</label>
-                        <input
-                            type="text"
-                            id="survey_description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+            <div className='survey-main'>
+                <div className="form-container survey-form-body">
+                    <h1>Survey Form</h1>
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSubmit(formData.status);
+                        }}
+                    >
+                        <div className="form-group">
+                            <label htmlFor="survey-survey_title">Survey Title</label>
+                            <input
+                                type="text"
+                                id="survey-survey_title"
+                                name="survey_title"
+                                value={formData.survey_title}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="survey_survey_description">Survey Description</label>
+                            <input
+                                type="text"
+                                id="survey_survey_description"
+                                name="survey_description"
+                                value={formData.survey_description}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="survey-category">Choose Category</label>
-                        <select
-                            id="survey-category"
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Please select any category</option>
-                            {categoryList.length > 0 ? (
-                                categoryList.map(category => (
-                                    <option key={category.value} value={category.value}>
-                                        {category.text}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>No categories available</option>
-                            )}
-                        </select>
-                    </div>
+                        <div className="form-group">
+                            <label htmlFor="survey-category">Choose Category</label>
+                            <select
+                                id="survey-category"
+                                name="category_id"
+                                value={formData.category_id}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">Please select any category</option>
+                                {categoryList.length > 0 ? (
+                                    categoryList.map(category => (
+                                        <option key={category.value} value={category.value}>
+                                            {category.text}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option value="" disabled>No categories available</option>
+                                )}
 
-                    <div className="form-group">
-                        <label htmlFor="new-category">Add New Category</label>
-                        <input
-                            type="text"
-                            id="new-category"
-                            value={newCategory}
-                            onChange={(e) => setNewCategory(e.target.value)}
-                            placeholder="Enter new category"
-                        />
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="new-category">Add New Category</label>
+                            <input
+                                type="text"
+                                id="new-category"
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value)}
+                                placeholder="Enter new category"
+                                disabled={categorySelected} // Disable if category is selected
+                            />
+                            <br></br>
+                            <button
+                                type="button"
+                                className='btn btn-outline-success mt-3'
+                                onClick={handleAddCategory}
+                                disabled={categorySelected} // Disable if category is selected
+                            >
+                                Add Category
+                            </button>
+                        </div>
+
                         <button
-                            type="button"
-                            className='btn btn-outline-warning'
-                            onClick={handleAddCategory}
+                            type="submit"
+                            className='btn btn-outline-secondary'
+                            onClick={() => setFormData(prev => ({ ...prev, status: 'draft' }))}
                         >
-                            Add Category
+                            Save as Draft
                         </button>
-                    </div>
-
-                    <button
-                        type="button"
-                        className='btn btn-outline-secondary'
-                        onClick={() => setFormData(prev => ({ ...prev, status: 'draft' }))}
-                    >
-                        Save as Draft
-                    </button>
-                    <button
-                        type="submit"
-                        className='btn btn-outline-danger'
-                        onClick={() => setFormData(prev => ({ ...prev, status: 'published' }))}
-                    >
-                        Publish
-                    </button>
-                </form>
+                        &nbsp;&nbsp;&nbsp;
+                        <button
+                            type="submit"
+                            className='btn btn-outline-danger'
+                            onClick={() => setFormData(prev => ({ ...prev, status: 'published' }))}
+                        >
+                            Publish
+                        </button>
+                    </form>
+                </div>
             </div>
+            <Footer />
         </>
     );
 }

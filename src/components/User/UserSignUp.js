@@ -1,204 +1,4 @@
-// import { useNavigate } from "react-router-dom";
-// import { ToastContainer,toast } from "react-toastify";
-// import Swal from 'sweetalert2';
-// import { useState } from "react";
-// import axios from 'axios'
 
-// export default function UserSignUp() {
-//     const [user_name, setName] = useState("")
-//     const [email_Address, setemail] = useState("")
-//     const [password, setpassword] = useState("")
-
-//     const navigate = useNavigate();
-
-//     // console.log('email,name', email + name);
-
-//     const validationname = () => {
-//         console.log(user_name);
-//         var status = true;
-//         var nameerror = document.getElementById("name");
-//         if (user_name.length == 0) {
-//             status = false;
-//             nameerror.innerHTML = "name is required";
-//         } else if (!isNaN(user_name)) {
-//             status = false;
-//             nameerror.innerHTML = "name must be character";
-//         } else {
-//             status = true;
-//             nameerror.innerHTML = "";
-//         }
-//         return status;
-//     }
-
-//     const validatepassword = () => {
-//         var status = true;
-//         var passworderror = document.getElementById("passworderror");
-//         if (password.length == 0) {
-//             status = false;
-//             passworderror.innerHTML = "Password is required"
-//         } else if (password.length <= 5) {
-//             passworderror.innerHTML = "Password must be more than 5 character"
-//         } else {
-//             status = true;
-//             passworderror.innerHTML = "";
-//         }
-//         return status;
-//     }
-
-//     const validationemail = () => {
-//         var status = true;
-//         var emailError = document.getElementById("emailerror");
-//         if (email_Address.length == 0) {
-//             status = false;
-//             emailError.innerHTML = "Email id is required";
-//         }
-//         else {
-//             let atTheRateIndex = email_Address.indexOf("@");
-//             if (atTheRateIndex == -1) {
-//                 status = false;
-//                 emailError.innerHTML = "Invalid email (@ not present)";
-//                 return status;
-//             }
-//             let lastIndexOfAtTheRate = email_Address.lastIndexOf("@");
-//             if (atTheRateIndex != lastIndexOfAtTheRate) {
-//                 status = false;
-//                 emailError.innerHTML = "Invalid email ( 2 @ present)";
-//                 return status;
-//             }
-
-//             let stringAfterAtTheRate = email_Address.substring(atTheRateIndex);
-//             let dotIndex = stringAfterAtTheRate.lastIndexOf(".");
-//             if (dotIndex == -1) {
-//                 status = false;
-//                 emailError.innerHTML = "Invalid email ( . not present)";
-//                 return status;
-//             }
-
-//             let domainString = stringAfterAtTheRate.substring(dotIndex);
-//             if (!(domainString == ".in" || domainString == ".com")) {
-//                 status = false;
-//                 emailError.innerHTML = "Invalid email ( .in or .com not present)";
-//                 return status;
-//             }
-
-//             if (email_Address.charAt(0) == '@') {
-//                 status = false;
-//                 emailError.innerHTML = "Invalid email ( starting with @)";
-//                 return status;
-//             }
-
-//             emailError.innerHTML = "";
-//         }
-//         return status;
-//     }
-
-
-//     function validation() {
-//         var fnamestatus = validationname();
-//         var emailstatus = validationemail();
-//         var passwordstatus = validatepassword();
-//         if (fnamestatus && emailstatus && passwordstatus) {
-//             return true;
-//         }
-//         return false;
-//     }
-
-//     const createAccount = () => {
-
-//         if (validation()) {  
-//             // console.log(process.env.REACT_APP_SECRET_KEY_SignUp);
-
-//             axios.post('http://localhost:3000/user/userSignUp', { user_name,email_Address,password})
-//             .then(res => {
-//                 Swal.fire({
-//                         position: "center",
-//                         icon: "success",
-//                         title: "Account Created Successfully",
-//                         showConfirmButton: false,
-//                         timer: 3000
-//                     });
-//                     let user = JSON.stringify(res.data.user);
-//                     console.log(user);
-
-//                     // localStorage.setItem("user", user);
-//                     // localStorage.setItem("userId", res.data.user.id)
-//                     navigate("/")
-//                 })
-//                 .catch(err => {
-//                     console.log(err);
-//                     Swal.fire({
-//                         icon: "error",
-//                         title: "Oops...",
-//                         text: "Something went wrong!",
-//                     });
-//                 })
-//         }
-//         else {
-//             toast.error("Please fill all the fields")
-//         }
-//     }
-//     return <>
-//       <ToastContainer
-//             position="top-center"
-//             autoClose={5000}
-//             hideProgressBar={false}
-//             newestOnTop={false}
-//             closeOnClick
-//             rtl={false}
-//             pauseOnFocusLoss
-//             draggable
-//             pauseOnHover
-//             theme="colored"
-//         />
-//         <div className='container-fluid m-0 p-0 mt-5' style={{ maxWidth: "100%", height: "100vh", backgroundColor: "#ffffff" }}>
-
-
-//             <div className="container d-flex justify-content-center align-items-start min-vh-100" style={{ backgroundColor: "#ffffff", marginTop: "10rem", height: "auto" }}>
-//                 <div className="row border rounded-5 p-3 bg-white shadow box-area mt-4">
-//                     <div className="col-md-6 p-0 rounded-4 d-flex justify-content-center align-items-center flex-column left-box" style={{ background: "#103cbe" }}>
-//                         <div className="featured-image">
-//                             <img src="./welcome.webp" className="rounded-4" style={{ width: "350px" }} />
-//                         </div>
-
-
-//                         <small className="text-white text-wrap text-center text" style={{ width: "17rem" }}>.</small>
-//                     </div>
-//                     <div className="col-md-6 right-box">
-//                         <div className="row align-items-center">
-//                             <div className="header-text">
-//                                 <h2>Welcome,</h2>
-//                                 <p className='ms-2'>We are happy to have you come here.</p>
-//                             </div>
-//                             <div className="input-group">
-//                                 <input type="text" onKeyUp={() => validationname()} onChange={event => setName(event.target.value)} className="form-control form-control-lg bg-light fs-6" placeholder="Username" />
-//                             </div>
-//                             <small className='text-danger' id='name'></small>
-//                             <div className="input-group mt-3">
-//                                 <input type="text" onKeyUp={() => validationemail()} onChange={event => setemail(event.target.value)} className="form-control form-control-lg bg-light fs-6" placeholder="Email address" />
-//                             </div>
-//                             <small className='text-danger' id='emailerror'></small>
-
-
-//                             <div className="input-group mt-3">
-//                                 <input type="password" onKeyUp={() => validatepassword()} onChange={event => setpassword(event.target.value)}className="form-control form-control-lg bg-light fs-6" placeholder="Password" />
-//                             </div>
-//                             <small className='text-danger' id='passworderror'></small>
-
-//                             <div className="input-group mt-5 mb-3">
-//                                 <button className="btn btn-lg btn-primary w-100 fs-6" onClick={() => createAccount()}>Sign up</button>
-//                             </div>
-
-//                             <div className="row">
-//                                 <small>Already have an account? <a className='text-primary' onClick={()=>navigate('/userSignIn')} style={{ cursor: "pointer" }}>Log in</a></small>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     </>
-
-// }
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Swal from 'sweetalert2';
@@ -301,26 +101,13 @@ export default function UserSignUp() {
         }
         return false;
     }
-    // const checkUserExists = async () => {
-    //     try {
-    //         const response = await axios.get('http://localhost:3000/user/userSignIn', { email_Address })
-    //         return response.data.exists;
-    //     } catch (error) {
-    //         console.error("Error checking user existence:", error);
-    //         Swal.fire({
-    //             icon: "error",
-    //             title: "Oops...",
-    //             text: "Error checking user existence.",
-    //         });
-    //         return false;
-    //     }
-    // }
-
+ 
     const createAccount = () => {
         if (validation()) {
             axios.post('http://localhost:3000/user/userSignUp', { user_name, email_Address, password })
                 .then(res => {
                     // Assuming that the success response does not have an error field
+                   if(res.status===200){
                     Swal.fire({
                         position: "center",
                         icon: "success",
@@ -334,9 +121,11 @@ export default function UserSignUp() {
                     // localStorage.setItem("user", user);
                     // localStorage.setItem("userId", res.data.user.id);
                     navigate("/userSignIn");
+                   }
+                
                 })
                 .catch(err => {
-                    if (err.response && err.response.status === 400) {
+                    if ( err.response.status === 400) {
                         // Handle known error for already signed-up users
                         Swal.fire({
                             icon: "warning",
@@ -377,8 +166,8 @@ export default function UserSignUp() {
                 pauseOnHover
                 theme="colored"
             />
-            <div className='container-fluid m-0 p-0 mt-5' style={{ maxWidth: "100%", height: "100vh", backgroundColor: "#ffffff" }}>
-                <div className="container d-flex justify-content-center align-items-start min-vh-100" style={{ backgroundColor: "#ffffff", marginTop: "10rem", height: "auto" }}>
+            <div className='container-fluid m-0 p-0 mt-5' style={{ maxWidth: "100%", height: "100vh", backgroundColor: "" }}>
+                <div className="container d-flex justify-content-center align-items-start min-vh-100" style={{ backgroundColor: "", marginTop: "10rem", height: "auto" }}>
                     <div className="row border rounded-5 p-3 bg-white shadow box-area mt-4">
                         <div className="col-md-6 p-0 rounded-4 d-flex justify-content-center align-items-center flex-column left-box" style={{ background: "#212529" }}>
                             <div className="featured-image">

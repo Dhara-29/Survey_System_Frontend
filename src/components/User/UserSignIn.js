@@ -123,8 +123,8 @@ export default function UserSignIn() {
 
     return <>
         <Header/>
-        <div className='container-fluid m-0 p-0' style={{ maxWidth: "100%", height: "100vh", backgroundColor: "#ffffff" }}>
-            <div className="container d-flex justify-content-center align-items-start min-vh-100" style={{ backgroundColor: "#ffffff", marginTop: "10rem", height: "auto" }}>
+        <div className='container-fluid m-0 p-0' style={{ maxWidth: "100%", height: "100vh", backgroundColor: "" }}>
+            <div className="container d-flex justify-content-center align-items-start min-vh-100" style={{ backgroundColor: "", marginTop: "10rem", height: "auto" }}>
                 <div className="row border rounded-5 p-3 bg-white shadow box-area mt-5">
                     <div className="col-md-6 p-0 rounded-4 d-flex justify-content-center align-items-center flex-column left-box" style={{ background: "#212529" }}>
                         <div className="featured-image">
